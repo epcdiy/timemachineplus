@@ -228,12 +228,28 @@ public class serviceRun {
            {
                long lastmotify=ret.getLong("motifytime");
                long filesize=ret.getLong("filesize");
+               String hash=ret.getString("md5");
+               long fidid=ret.getLong("id");
                if(lastmotify==fileHandle.lastModified()&&filesize==fileHandle.length())
                {
                    //mysqlHelper.exeSql("insert into tb_backfilehistory (backupfileid,backupid,motifytime,filesize,backuptargetpath,backuptargetrootid,md5) values (" +
                    //        id+","+backupid+","+fileHandle.lastModified()+","+fileHandle.length()+",'"+ret.getString("backuptargetpath")+"',"+ret.getInt("backuptargetrootid")+",'"+ret.getString("md5")+"')");
 
                    continue;
+               }
+               System.out.println("motify time indb:"+lastmotify+" real:"+fileHandle.lastModified()+" filesize indb:"+filesize+" real:"+fileHandle.length());
+              //如果修改时间不一样，文件大小一样，追加校验一次hash，如果hash一样，则更新修改时间，不执行备份
+               if(lastmotify!=fileHandle.lastModified()&&filesize==fileHandle.length())
+               {
+                   String md5str=DigestUtils.md5Hex(new FileInputStream(fileHandle));
+                   if(md5str.equals(hash))
+                   {
+                       logger.info("file not changed but motifytime diff, correcting...");
+                       mysqlHelper.exeSql("update tb_backfilehistory set motifytime="+lastmotify+" where backupfileid="+id+" and id="+fidid);
+                       continue;
+                   }
+                   System.out.println("hash indb:"+hash+" real:"+md5str);
+
                }
            }
            if(!exeCopy(fileHandle,file, id))
