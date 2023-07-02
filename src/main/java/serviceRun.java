@@ -244,8 +244,9 @@ public class serviceRun {
                    String md5str=DigestUtils.md5Hex(new FileInputStream(fileHandle));
                    if(md5str.equals(hash))
                    {
-                       logger.info("file not changed but motifytime diff, correcting...");
-                       mysqlHelper.exeSql("update tb_backfilehistory set motifytime="+lastmotify+" where backupfileid="+id+" and id="+fidid);
+                       logger.error("historyfile id=【"+fidid+"】 backupid:【"+id+"】 not changed but motifytime diff db：【"+lastmotify+"】 file system:【"+fileHandle.lastModified()+"】, correcting...");
+                       fileHandle.setLastModified(lastmotify);
+                       //mysqlHelper.exeSql("update tb_backfilehistory set motifytime="+lastmotify+" where backupfileid="+id+" and id="+fidid);
                        continue;
                    }
                    System.out.println("hash indb:"+hash+" real:"+md5str);
