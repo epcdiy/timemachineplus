@@ -34,7 +34,7 @@ CREATE TABLE `tb_backfilehistory` (
   `backupid` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `dualid` (`backupfileid`,`backupid`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=601953 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for tb_backfiles
@@ -49,7 +49,7 @@ CREATE TABLE `tb_backfiles` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `backuprootid` (`backuprootid`),
   FULLTEXT KEY `filepath` (`filepath`)
-) ENGINE=InnoDB AUTO_INCREMENT=515337 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for tb_backup
@@ -62,7 +62,7 @@ CREATE TABLE `tb_backup` (
   `filecopycount` int(11) DEFAULT NULL COMMENT '变动文件数',
   `datacopycount` bigint(20) DEFAULT NULL COMMENT '拷贝字节数',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=531 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for tb_backuproot
@@ -72,7 +72,7 @@ CREATE TABLE `tb_backuproot` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `rootpath` varchar(4096) DEFAULT NULL COMMENT '来源根路径',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for tb_backuptargetroot
@@ -82,6 +82,6 @@ CREATE TABLE `tb_backuptargetroot` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tagetrootpath` varchar(4096) DEFAULT NULL COMMENT '备份目标路径根目录',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS = 1;
