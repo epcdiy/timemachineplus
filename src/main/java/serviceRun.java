@@ -139,8 +139,12 @@ public class serviceRun {
             outputChannel = new FileOutputStream(dest).getChannel();
             outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
         } finally {
-            inputChannel.close();
-            outputChannel.close();
+            if (inputChannel != null) {
+                inputChannel.close();
+            }
+            if(outputChannel != null) {
+                outputChannel.close();
+            }
         }
     }
     boolean exeCopy(File fileHandle,String file,long backupfileid) throws IOException {
@@ -150,7 +154,13 @@ public class serviceRun {
             logger.error("no space in all targetbackups! need:"+fileHandle.length());
             return false;
         }
-        String md5str=DigestUtils.md5Hex(new FileInputStream(file));
+        FileInputStream fileStream = new FileInputStream(file);
+        String md5str = "";
+        try {
+            md5str = DigestUtils.md5Hex(fileStream);
+        } finally {
+            fileStream.close();
+        }
         String targetName=backuptargetroot.getTagetrootpath()+File.separator+backuptargetroot.getTargetrootdir()+File.separator+md5str+"_"+System.currentTimeMillis();
         String targetNameSave=File.separator+backuptargetroot.getTargetrootdir()+File.separator+md5str+"_"+System.currentTimeMillis();
         LocalDateTime begincopysingle=LocalDateTime.now();
