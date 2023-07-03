@@ -19,7 +19,6 @@ import java.util.ResourceBundle;
 public class MySQLHelper
 {
     public String url = null;// "jdbc:mysql://127.0.0.1/vge_whu"; //数据库连接
-    public String name = "com.mysql.jdbc.Driver";   //程序驱动
     public String user = null;//"root";  //用户名
     public String password = null;//"abc@123"; //密码
     private String configFilename;
@@ -65,7 +64,6 @@ public class MySQLHelper
             }
         }
         try {
-            Class.forName(name);// 指定连接类型
             conn = DriverManager.getConnection(url, user, password);// 获取连接
             logger.info("mysql connected!");
             return true;
