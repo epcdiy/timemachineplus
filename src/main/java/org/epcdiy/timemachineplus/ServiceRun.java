@@ -20,18 +20,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-/**
- * Created by liuq2 on 2018/3/19.
- */
 public class ServiceRun {
 
     private MySQLHelper mysqlHelper;
     static Logger logger = Logger.getLogger(ServiceRun.class);
     private List<BackupRoot> backupRootList = new ArrayList<>();
     private List<BackupTargetRoot> backupTargetRootList = new ArrayList<>();
-    private long filecopycount = 0;
-    private long datacopycount = 0;
-    private int backupid = 0;
+    private long fileCopyCount = 0;
+    private long dataCopyCount = 0;
+    private int backupId = 0;
 
     public static void main(String[] args) {
         ServiceRun serviceRun = new ServiceRun();
@@ -41,13 +38,13 @@ public class ServiceRun {
             if (args.length == 1) {
                 if (args[0].equals("checkdata")) {
                     logger.info("begin to checkdata");
-                    serviceRun.checkdata(false);
+                    serviceRun.checkData(false);
                 } else if (args[0].equals("checkdatawithhash")) {
                     logger.info("begin to checkdata with hash");
-                    serviceRun.checkdata(true);
+                    serviceRun.checkData(true);
                 } else {
                     logger.info("cleaning data from backuprootid：" + args[0]);
-                    serviceRun.deleteByBackuprootid(Long.parseLong(args[0]));
+                    serviceRun.deleteByBackupRootId(Long.parseLong(args[0]));
                     return;
                 }
             }
@@ -170,7 +167,7 @@ public class ServiceRun {
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         mysqlHelper.exeSql("insert into tb_backfilehistory (backupfileid,backupid,motifytime,filesize,copystarttime,copyendtime,backuptargetpath,backuptargetrootid,md5) values (" +
-                backupfileid + "," + backupid + "," + fileHandle.lastModified() + "," + fileHandle.length() + ",'" + dateTimeFormatter.format(begincopysingle) + "','" + dateTimeFormatter.format(LocalDateTime.now()) + "','" + targetNameSave + "'," + backuptargetroot.getId() + ",'" + md5str + "')");
+                backupfileid + "," + backupId + "," + fileHandle.lastModified() + "," + fileHandle.length() + ",'" + dateTimeFormatter.format(begincopysingle) + "','" + dateTimeFormatter.format(LocalDateTime.now()) + "','" + targetNameSave + "'," + backuptargetroot.getId() + ",'" + md5str + "')");
         logger.info("copy file from " + file + " to " + targetName);
         return true;
     }
@@ -250,12 +247,12 @@ public class ServiceRun {
                 logger.error("拷贝错误！退出...");
                 break;
             }
-            filecopycount++;
-            datacopycount += fileHandle.length();
+            fileCopyCount++;
+            dataCopyCount += fileHandle.length();
         }
     }
 
-    private int beginbackup() throws SQLException {
+    private int beginBackup() throws SQLException {
         mysqlHelper.exeSql("insert into tb_backup (begintime) values(now())");
         ResultSet ret = mysqlHelper.querySql("select LAST_INSERT_ID() from tb_backup");
         if (ret != null && ret.next()) {
@@ -264,11 +261,11 @@ public class ServiceRun {
         return -1;
     }
 
-    private void finishbackup() {
-        mysqlHelper.exeSql("update tb_backup set endtime=now(),filecopycount=" + filecopycount + ",datacopycount=" + datacopycount + " where id=" + backupid);
+    private void finishBackup() {
+        mysqlHelper.exeSql("update tb_backup set endtime=now(),filecopycount=" + fileCopyCount + ",datacopycount=" + dataCopyCount + " where id=" + backupId);
     }
 
-    public void deleteByBackuprootid(long rootid) throws SQLException {
+    public void deleteByBackupRootId(long rootid) throws SQLException {
         long counter = 0;
         long timestamp = new Date().getTime() / 1000;
         System.out.println("loading files backuprootid=" + rootid);
@@ -299,8 +296,8 @@ public class ServiceRun {
 
     public void XCopy() {
         try {
-            backupid = beginbackup();
-            if (backupid == -1) {
+            backupId = beginBackup();
+            if (backupId == -1) {
                 return;
             }
         } catch (Exception e) {
@@ -314,10 +311,10 @@ public class ServiceRun {
                 logger.error(e.getMessage());
             }
         }
-        finishbackup();
+        finishBackup();
     }
 
-    private String getTargetrootPath(int targetbkid) {
+    private String getTargetRootPath(int targetbkid) {
         for (BackupTargetRoot backuptargetroot : backupTargetRootList) {
             if (backuptargetroot.getId() == targetbkid) {
                 return backuptargetroot.getTargetRootPath();
@@ -352,7 +349,7 @@ public class ServiceRun {
         }
     }
 
-    private void checkdata(boolean withhash) {
+    private void checkData(boolean withhash) {
         try {
             logger.info("loading all file and check");
             int innercounter = 0;
@@ -370,7 +367,7 @@ public class ServiceRun {
                     backupHistory.setBackupTargetRootId(ret.getInt("backuptargetrootid"));
                     backupHistory.setBackupTargetPath(ret.getString("backuptargetpath"));
                     //check file
-                    String backuprootpath = getTargetrootPath(backupHistory.getBackupTargetRootId()) + backupHistory.getBackupTargetPath();
+                    String backuprootpath = getTargetRootPath(backupHistory.getBackupTargetRootId()) + backupHistory.getBackupTargetPath();
                     backupHistory.setBackupTargetFullPath(backuprootpath);
                     File fp = new File(backuprootpath);
                     if (!fp.exists() || fp.length() != backupHistory.getFileSize()) {
