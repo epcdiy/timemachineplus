@@ -1,1 +1,1 @@
-java -classpath "/程序所在路径/*" serviceRun
+java -jar timemachineplus-1.0.1-SNAPSHOT.jar
